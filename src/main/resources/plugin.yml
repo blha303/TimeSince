@@ -1,3 +1,8 @@
 name: TimeSince
 main: blha303.TimeSince
-version: 1
+version: 3.5
+commands:
+    timesince:
+      description: "See the time since the last person left the server"
+      usage: "/timesince"
+      aliases: ['since']

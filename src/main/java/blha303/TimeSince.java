@@ -1,17 +1,22 @@
 package blha303;
 
+import java.util.Date;
 import java.util.logging.Logger;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.ocpsoft.prettytime.PrettyTime;
 
 public class TimeSince extends JavaPlugin implements Listener {
 	
 	private static final Logger log = Logger.getLogger("Minecraft");
 	boolean debug = false;
+	PrettyTime p = new PrettyTime();
 
 	public void onEnable() {
 		getConfig().addDefault("lastPlayerLeftAt", 1357623885);
@@ -39,10 +44,7 @@ public class TimeSince extends JavaPlugin implements Listener {
 				getConfig().set("firstrun", false);
 				return;
 			} else {
-				int time = safeLongToInt(System.currentTimeMillis()/1000);
-				int logout = getConfig().getInt("lastPlayerLeftAt");
-				if (debug) log.info(logout + " " + time);
-				event.getPlayer().sendMessage("Someone was on this server " + ((logout - time) * -1) + " seconds ago!");
+				event.getPlayer().sendMessage(timesince());
 				return;
 			}
 		}
@@ -64,6 +66,13 @@ public class TimeSince extends JavaPlugin implements Listener {
 		}
 	}
 	
+	public boolean onCommand(CommandSender cs, Command cmnd, String string,
+			String[] args) {
+		cs.sendMessage(timesince());
+		
+		return true;
+	}
+	
 	// http://stackoverflow.com/questions/1590831/safely-casting-long-to-int-in-java
 	public static int safeLongToInt(long l) {
 	    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
@@ -71,5 +80,13 @@ public class TimeSince extends JavaPlugin implements Listener {
 	            (l + " cannot be cast to int without changing its value.");
 	    }
 	    return (int) l;
+	}
+	
+	public String timesince() {
+		int time = safeLongToInt(System.currentTimeMillis()/1000);
+		int logout = getConfig().getInt("lastPlayerLeftAt");
+		String ptime = p.format(new Date(logout));
+		if (debug) log.info(logout + " " + time);
+		return "Someone was on this server " + ptime + "!";
 	}
 }
