@@ -1,6 +1,5 @@
 package blha303;
 
-import java.util.Date;
 import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
@@ -10,13 +9,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.ocpsoft.prettytime.PrettyTime;
 
 public class TimeSince extends JavaPlugin implements Listener {
 	
 	private static final Logger log = Logger.getLogger("Minecraft");
 	boolean debug = false;
-	PrettyTime p = new PrettyTime();
 
 	public void onEnable() {
 		getConfig().addDefault("lastPlayerLeftAt", 1357623885);
@@ -83,10 +80,28 @@ public class TimeSince extends JavaPlugin implements Listener {
 	}
 	
 	public String timesince() {
+		String out = "";
 		int time = safeLongToInt(System.currentTimeMillis()/1000);
 		int logout = getConfig().getInt("lastPlayerLeftAt");
-		String ptime = p.format(new Date(logout));
 		if (debug) log.info(logout + " " + time);
-		return "Someone was on this server " + ptime + "!";
+		int ts = ((logout - time) * -1);
+		if (ts > 60) {
+			if (ts > 60*60) {
+				if (ts > 60*60*24) {
+					if (ts > 60*60*24*30) {
+						out = (ts/60/60/24/30 + " months ago");
+					} else {
+						out = (ts/60/60/24 + " days ago");
+					}
+				} else {
+					out = (ts/60/60 + " hours ago");
+				}
+			} else {
+				out = (ts/60 + " minutes ago");
+			}
+		} else {
+			out = (ts + " seconds ago");
+		}
+		return "Someone was on this server " + out + "!";
 	}
 }
